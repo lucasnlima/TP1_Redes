@@ -36,6 +36,24 @@ int main()
     while((n = read(CreateSocket, dataReceived, sizeof(dataReceived)-1)) > 0)
     {
         dataReceived[n] = 0;
+
+        char fileName[] = "arq1.txt";
+
+        FILE *arq;
+
+        arq = fopen(fileName, "w");
+
+        if(arq == NULL){
+          printf("Erro na criação do arquivo");
+          return 1;
+        }
+
+        fprintf(arq, "%s", dataReceived);
+
+        fclose(arq);
+
+        printf("Arquivo tranferido com sucesso\n Conteudo: \n");
+
         if(fputs(dataReceived, stdout) == EOF)
         {
             printf("\nStandard output error");
@@ -43,6 +61,7 @@ int main()
 
         printf("\n");
     }
+
 
     if( n < 0)
     {
