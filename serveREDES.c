@@ -4,18 +4,13 @@
 
 #include <sys/socket.h>
 #include <sys/types.h>
-#include <netinet/in.h> 
+#include <netinet/in.h>
 
 
 int main(int argc, char const *argv[]) {
 
         //-- Definição das estruturas de endereço do cliente e do servidor
-        struct sockaddr_in adressServer {
-                adressServer.sin_family = AF_INET;
-                adressServer.sin_port = htons(port);
-                adressServer.sin_addr.s_addr = htonl(INADDR_ANY);
-        }
-
+        struct sockaddr_in adressServer;
         struct sockaddr_in adressClient;
 
         int port, buffer_size;
@@ -32,6 +27,10 @@ int main(int argc, char const *argv[]) {
                    AF_INET - Define que trabalhara com a internet, SOCK_STREAM - Uso do TCP
                    0 - Defini o uso do IP*/
                 sockfd = socket(AF_INET, SOCK_STREAM, 0);
+
+                adressServer.sin_family = AF_INET;
+                adressServer.sin_port = htons(port);
+                adressServer.sin_addr.s_addr = htonl(INADDR_ANY);
 
                 //-- Testa se o socket foi criado
                 if(sockfd == -1) {
@@ -57,17 +56,35 @@ int main(int argc, char const *argv[]) {
         scanf("%d",&port);
         printf("\n\n Digite o tamanho do buffer:");
         scanf("%d",&buffer_size);
-        printf("\n\n Digite uma mensagem:");
-        scanf("%s",buffer);
+      //  printf("\n\n Digite uma mensagem:");
+        //scanf("%s",buffer);
         openSocket(port);
+
 
         while(1)
         {
                 printf("\n\nServidor esperando conexões...\n");
                 //-- Aceitando requisição de conexão de um cliente
                 client = accept(sockfd, (struct sockaddr*) &adressClient, &csize);
-                //-- Enviando mensagem para o cliente
-                send(client, buffer, strlen(buffer), 0);
+                //-- Enviando arquivo para o cliente.
+
+                // -- cria o pronteiro de arquvo
+                FILE *arq;
+                
+                char fileName[] = "arqteste.txt";
+
+                arq = fopen(fileName, "r");
+                if (arq == NULL){
+                  printf("\nERRO! O arquivo não foi aberto");
+                }
+
+                while(fgets(buffer, buffer_size, arq) != NULL){
+                  send(client, buffer, strlen(buffer), 0);
+                  printf("%s\n",buffer );
+                }
+
+                fclose(arq);
+
         }
 
         return 0;
