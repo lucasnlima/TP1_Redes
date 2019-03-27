@@ -20,6 +20,10 @@ int main(int argc, char const *argv[]) {
         int csize = sizeof adressClient;
 
         char buffer[buffer_size];
+        char fileName[255];
+
+        memset(fileName,0,255);
+        memset(buffer,0,buffer_size);
 
         int openSocket(int port){
 
@@ -56,8 +60,6 @@ int main(int argc, char const *argv[]) {
         scanf("%d",&port);
         printf("\n\n Digite o tamanho do buffer:");
         scanf("%d",&buffer_size);
-      //  printf("\n\n Digite uma mensagem:");
-        //scanf("%s",buffer);
         openSocket(port);
 
 
@@ -66,22 +68,31 @@ int main(int argc, char const *argv[]) {
                 printf("\n\nServidor esperando conexões...\n");
                 //-- Aceitando requisição de conexão de um cliente
                 client = accept(sockfd, (struct sockaddr*) &adressClient, &csize);
+
+
+
+                //-- Recebe mensagem do cliente contendo nome do arquivo a ser enviado:
+                int mensagem_len;
+                if((mensagem_len = recv(client, fileName, 255,0)) > 0){
+                  fileName[mensagem_len] = '\0';
+                  printf("O arquivo solicidado pelo cliente é : %s\n",fileName);
+                }
+
                 //-- Enviando arquivo para o cliente.
 
                 // -- cria o pronteiro de arquvo
                 FILE *arq;
-                
-                char fileName[] = "arqteste.txt";
 
                 arq = fopen(fileName, "r");
                 if (arq == NULL){
                   printf("\nERRO! O arquivo não foi aberto");
                 }
 
-                while(fgets(buffer, buffer_size, arq) != NULL){
-                  send(client, buffer, strlen(buffer), 0);
-                  printf("%s\n",buffer );
-                }
+
+                  fgets(buffer, buffer_size, arq);
+                  send(client, buffer, buffer_size, 0);
+                
+
 
                 fclose(arq);
 
@@ -89,3 +100,4 @@ int main(int argc, char const *argv[]) {
 
         return 0;
 }
+
