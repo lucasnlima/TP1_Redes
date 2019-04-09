@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/time.h>
 
 #include <sys/socket.h>
 #include <sys/types.h>
@@ -11,6 +12,7 @@ int main(int argc, char const *argv[]) {
 
         //-- Definição das estruturas de endereço do cliente
         struct sockaddr_in adressServer;
+        struct timeval tv;
 
         int port, buffer_size;
         int sockfd, client;
@@ -18,7 +20,7 @@ int main(int argc, char const *argv[]) {
         //--- inteiro que armazena o tamanho da estrutra de endereço do cliente
         int csize = sizeof adressServer;
 
-        char buffer[buffer_size];
+
         char fileName[255];
         char server_adress[15];
 
@@ -61,24 +63,29 @@ int main(int argc, char const *argv[]) {
 
 
 
+
         send(sockfd, fileName,strlen(fileName),0);
         printf("%s\n",fileName);
-
-
-
-               recv(sockfd, buffer, csize,0);
 
                 // -- cria o pronteiro de arquvo
                 FILE *arq;
 
-                arq = fopen(fileName, "w");
+                arq = fopen(fileName, "w+");
+
 
                 if(arq == NULL){
                   printf("Erro na criação do arquivo");
                   return 1;
                 }
 
+                char buffer[buffer_size];
+                memset(buffer,0,buffer_size);
+
+                while(recv(sockfd, buffer, buffer_size,0)>0){
+                //fputs(buffer, stdout);
                 fprintf(arq, "%s", buffer);
+                memset(buffer,0,buffer_size);
+                }
 
                 fclose(arq);
 
@@ -90,6 +97,6 @@ int main(int argc, char const *argv[]) {
                 }
 
 
-
         return 0;
 }
+
