@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
+
 
 #include <sys/socket.h>
 #include <sys/types.h>
@@ -19,11 +21,11 @@ int main(int argc, char const *argv[]) {
         //--- inteiro que armazena o tamanho da estrutra de endereço do cliente
         int csize = sizeof adressClient;
 
-        char buffer[buffer_size];
+
         char fileName[255];
 
         memset(fileName,0,255);
-        memset(buffer,0,buffer_size);
+
 
         int openSocket(int port){
 
@@ -63,6 +65,8 @@ int main(int argc, char const *argv[]) {
         openSocket(port);
 
 
+
+
         while(1)
         {
                 printf("\n\nServidor esperando conexões...\n");
@@ -89,15 +93,23 @@ int main(int argc, char const *argv[]) {
                 }
 
 
-                  fgets(buffer, buffer_size, arq);
-                  send(client, buffer, buffer_size, 0);
-                
+                char buffer[buffer_size];
 
+
+
+
+                  while(!feof(arq)){
+                    memset(buffer,0,buffer_size);
+                    fgets(buffer, buffer_size, arq);
+                    //fputs(buffer, stdout);
+                    send(client, buffer, buffer_size, 0);
+                  }
 
                 fclose(arq);
+
+                close(client);
 
         }
 
         return 0;
 }
-
