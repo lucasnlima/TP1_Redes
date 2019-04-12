@@ -77,9 +77,9 @@ int main(int argc, char const *argv[]) {
 
                 //-- Recebe mensagem do cliente contendo nome do arquivo a ser enviado:
                 int mensagem_len;
-                if((mensagem_len = recv(client, fileName, 255,0)) > 0){
-                  fileName[mensagem_len] = '\0';
-                  printf("O arquivo solicidado pelo cliente é : %s\n",fileName);
+                if((mensagem_len = recv(client, fileName, 255,0)) > 0) {
+                        fileName[mensagem_len] = '\0';
+                        printf("O arquivo solicidado pelo cliente é : %s\n",fileName);
                 }
 
                 //-- Enviando arquivo para o cliente.
@@ -88,8 +88,8 @@ int main(int argc, char const *argv[]) {
                 FILE *arq;
 
                 arq = fopen(fileName, "r");
-                if (arq == NULL){
-                  printf("\nERRO! O arquivo não foi aberto");
+                if (arq == NULL) {
+                        printf("\nERRO! O arquivo não foi aberto");
                 }
 
 
@@ -98,12 +98,11 @@ int main(int argc, char const *argv[]) {
 
 
 
-                  while(!feof(arq)){
-                    memset(buffer,0,buffer_size);
-                    fgets(buffer, buffer_size, arq);
-                    //fputs(buffer, stdout);
-                    send(client, buffer, buffer_size, 0);
-                  }
+                while(!feof(arq)) {
+                        memset(buffer,0,buffer_size);
+                        fread(&buffer,1,buffer_size,arq );
+                        send(client, buffer, buffer_size, 0);
+                }
 
                 fclose(arq);
 
